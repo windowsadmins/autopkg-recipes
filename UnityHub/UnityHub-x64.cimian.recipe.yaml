@@ -1,0 +1,41 @@
+Description: Downloads the latest Unity Hub installer (x64) and imports into Cimian.
+Identifier: com.github.autopkg.cimian.UnityHub-x64
+MinimumVersion: "2.7.0"
+Input:
+  NAME: UnityHub
+  ARCHITECTURE: x64
+
+Process:
+  - Processor: URLDownloader
+    Arguments:
+      url: "https://public-cdn.cloud.unity3d.com/hub/prod/UnityHubSetup.exe"
+      filename: "%NAME%-%ARCHITECTURE%.exe"
+
+  - Processor: EndOfCheckPhase
+
+  - Processor: CimianInfoCreator
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: exe
+      cimian_info_name: "%NAME%"
+      cimian_info_category: Interactive
+      cimian_info_developer: Unity Technologies
+      cimian_info_icon_name: "%NAME%.png"
+      cimian_info_description: >
+        Unity Hub is the launcher for managing Unity editor installations,
+        licensing, and project workflows.
+
+  - Processor: CimianImporter
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: exe
+      cimian_subdirectory: apps/interactive
+      installer_switches:
+        - /S
+      supported_architectures:
+        - "%ARCHITECTURE%"
+      catalogs:
+        - Development
+        - Testing
+      unattended_install: true
+      unattended_uninstall: true

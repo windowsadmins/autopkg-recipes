@@ -1,0 +1,45 @@
+Description: Downloads the latest Cyberduck MSI installer (arm64) and imports into Cimian.
+Identifier: com.github.autopkg.cimian.Cyberduck-arm64
+MinimumVersion: "2.7.0"
+Input:
+  NAME: Cyberduck
+  ARCHITECTURE: arm64
+
+Process:
+  - Processor: URLTextSearcher
+    Arguments:
+      url: https://version.cyberduck.io/windows/changelog.rss
+      re_pattern: 'Cyberduck-Installer-(?P<version>[\d.]+)\.exe'
+      result_output_var_name: version
+
+  - Processor: URLDownloader
+    Arguments:
+      url: "https://update.cyberduck.io/windows/arm64/Cyberduck-Installer-%version%.msi"
+      filename: "%NAME%-%ARCHITECTURE%.msi"
+
+  - Processor: EndOfCheckPhase
+
+  - Processor: CimianInfoCreator
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: msi
+      cimian_info_name: "%NAME%"
+      cimian_info_category: Utilities
+      cimian_info_developer: iterate GmbH
+      cimian_info_icon_name: "%NAME%.png"
+      cimian_info_description: >
+        Cyberduck is an open-source client for FTP and SFTP, WebDAV, and
+        cloud storage, available for Windows licensed under the GPL.
+
+  - Processor: CimianImporter
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: msi
+      cimian_subdirectory: apps/utilities
+      supported_architectures:
+        - "%ARCHITECTURE%"
+      catalogs:
+        - Development
+        - Testing
+      unattended_install: true
+      unattended_uninstall: false

@@ -1,0 +1,47 @@
+Description: Downloads the latest 7-Zip installer (arm64) and imports into Cimian.
+Identifier: com.github.autopkg.cimian.7-Zip-arm64
+MinimumVersion: "2.7.0"
+Input:
+  NAME: 7-Zip
+  ARCHITECTURE: arm64
+
+Process:
+  - Processor: URLTextSearcher
+    Arguments:
+      url: https://www.7-zip.org/download.html
+      re_pattern: 'href="(?P<match>a/7z[\d]+-arm64\.exe)"'
+      result_output_var_name: relative_url
+
+  - Processor: URLDownloader
+    Arguments:
+      url: "https://www.7-zip.org/%relative_url%"
+      filename: "%NAME%-%ARCHITECTURE%.exe"
+
+  - Processor: EndOfCheckPhase
+
+  - Processor: CimianInfoCreator
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: exe
+      cimian_info_name: "%NAME%"
+      cimian_info_category: Utilities
+      cimian_info_developer: Igor Pavlov
+      cimian_info_icon_name: "%NAME%.png"
+      cimian_info_description: >
+        7-Zip is a file archiver with a high compression ratio supporting
+        7z, LZMA2, XZ, ZIP, GZIP, BZIP2, and TAR formats.
+
+  - Processor: CimianImporter
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: exe
+      cimian_subdirectory: apps/utilities
+      installer_switches:
+        - /S
+      supported_architectures:
+        - "%ARCHITECTURE%"
+      catalogs:
+        - Development
+        - Testing
+      unattended_install: true
+      unattended_uninstall: false

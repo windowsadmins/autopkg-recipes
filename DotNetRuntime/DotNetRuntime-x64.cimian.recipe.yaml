@@ -1,0 +1,44 @@
+Description: Downloads the latest .NET 10 Runtime installer (x64) and imports into Cimian.
+Identifier: com.github.autopkg.cimian.DotNetRuntime-x64
+MinimumVersion: "2.7.0"
+Input:
+  NAME: DotNetRuntime
+  CHANNEL: "10.0"
+  ARCHITECTURE: x64
+
+Process:
+  - Processor: URLDownloader
+    Arguments:
+      url: "https://aka.ms/dotnet/%CHANNEL%/dotnet-runtime-win-x64.exe"
+      filename: "%NAME%-%ARCHITECTURE%.exe"
+
+  - Processor: EndOfCheckPhase
+
+  - Processor: CimianInfoCreator
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: exe
+      cimian_info_name: "%NAME%"
+      cimian_info_category: Development
+      cimian_info_developer: Microsoft Corporation
+      cimian_info_icon_name: "%NAME%.png"
+      cimian_info_description: >
+        The .NET Runtime provides the components required to run .NET
+        applications on Windows.
+
+  - Processor: CimianImporter
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: exe
+      cimian_subdirectory: apps/dev
+      installer_switches:
+        - /install
+        - /quiet
+        - /norestart
+      supported_architectures:
+        - "%ARCHITECTURE%"
+      catalogs:
+        - Development
+        - Testing
+      unattended_install: true
+      unattended_uninstall: true

@@ -1,0 +1,42 @@
+Description: Downloads the latest Firefox Enterprise MSI (x64) and imports into Cimian.
+Identifier: com.github.autopkg.cimian.Firefox-x64
+MinimumVersion: "2.7.0"
+Input:
+  NAME: Firefox
+  DOWNLOAD_URL: "https://download.mozilla.org/?product=firefox-msi-latest-ssl&os=win64&lang=en-US"
+  ARCHITECTURE: x64
+
+Process:
+  - Processor: URLDownloader
+    Arguments:
+      url: "%DOWNLOAD_URL%"
+      filename: "%NAME%-%ARCHITECTURE%.msi"
+
+  - Processor: EndOfCheckPhase
+
+  - Processor: CimianInfoCreator
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: msi
+      cimian_info_name: "%NAME%"
+      cimian_info_category: Browsers
+      cimian_info_developer: Mozilla
+      cimian_info_icon_name: "%NAME%.png"
+      cimian_info_description: >
+        Firefox is a free and open-source web browser developed by Mozilla,
+        focused on privacy, security, and customization.
+
+  - Processor: CimianImporter
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: msi
+      cimian_subdirectory: apps/browsers
+      supported_architectures:
+        - "%ARCHITECTURE%"
+      catalogs:
+        - Development
+        - Testing
+      blocking_applications:
+        - firefox
+      unattended_install: true
+      unattended_uninstall: true

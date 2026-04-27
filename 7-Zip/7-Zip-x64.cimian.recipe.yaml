@@ -1,0 +1,46 @@
+Description: Downloads the latest 7-Zip MSI installer (x64) and imports into Cimian.
+Identifier: com.github.autopkg.cimian.7-Zip-x64
+MinimumVersion: "2.7.0"
+Input:
+  NAME: 7-Zip
+  ARCHITECTURE: x64
+
+Process:
+  # 7-zip.org/download.html only hosts MSIs for v23.01 and older; the latest
+  # releases are published as GitHub assets (7z<VER>-x64.msi).
+  - Processor: GitHubReleasesInfoProvider
+    Arguments:
+      github_repo: ip7z/7zip
+      asset_regex: '^7z[\d]+-x64\.msi$'
+      include_prereleases: false
+
+  - Processor: URLDownloader
+    Arguments:
+      filename: "%NAME%-%ARCHITECTURE%.msi"
+
+  - Processor: EndOfCheckPhase
+
+  - Processor: CimianInfoCreator
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: msi
+      cimian_info_name: "%NAME%"
+      cimian_info_category: Utilities
+      cimian_info_developer: Igor Pavlov
+      cimian_info_icon_name: "%NAME%.png"
+      cimian_info_description: >
+        7-Zip is a file archiver with a high compression ratio supporting
+        7z, LZMA2, XZ, ZIP, GZIP, BZIP2, and TAR formats.
+
+  - Processor: CimianImporter
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: msi
+      cimian_subdirectory: apps/utilities
+      supported_architectures:
+        - "%ARCHITECTURE%"
+      catalogs:
+        - Development
+        - Testing
+      unattended_install: true
+      unattended_uninstall: false

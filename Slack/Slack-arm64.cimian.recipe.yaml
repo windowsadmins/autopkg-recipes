@@ -1,0 +1,46 @@
+Description: Downloads the latest Slack desktop MSIX (arm64) and imports into Cimian.
+Identifier: com.github.autopkg.cimian.Slack-arm64
+MinimumVersion: "2.7.0"
+Input:
+  NAME: Slack
+  ARCHITECTURE: arm64
+
+Process:
+  - Processor: URLTextSearcher
+    Arguments:
+      url: "https://slack.com/release-notes/windows"
+      re_pattern: 'Slack\s+(\d+\.\d+\.\d+)'
+      result_output_var_name: VERSION
+
+  - Processor: URLDownloader
+    Arguments:
+      url: "https://downloads.slack-edge.com/desktop-releases/windows/arm64/%VERSION%/Slack.msix"
+      filename: "%NAME%-%ARCHITECTURE%.msix"
+
+  - Processor: EndOfCheckPhase
+
+  - Processor: CimianInfoCreator
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: msix
+      cimian_info_name: "%NAME%"
+      cimian_info_category: Communication
+      cimian_info_developer: "Slack Technologies Inc."
+      cimian_info_icon_name: "%NAME%.png"
+      cimian_info_description: >
+        Slack is a messaging platform for teams that enables real-time
+        communication, file sharing, and integration with various tools
+        to streamline collaboration and productivity.
+
+  - Processor: CimianImporter
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: msix
+      cimian_subdirectory: apps/comms
+      supported_architectures:
+        - "%ARCHITECTURE%"
+      catalogs:
+        - Development
+        - Testing
+      unattended_install: true
+      unattended_uninstall: true

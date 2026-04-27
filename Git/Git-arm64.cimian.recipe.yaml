@@ -1,0 +1,49 @@
+Description: Downloads the latest Git for Windows installer (arm64) and imports into Cimian.
+Identifier: com.github.autopkg.cimian.Git-arm64
+MinimumVersion: "2.7.0"
+Input:
+  NAME: Git
+  ARCHITECTURE: arm64
+
+Process:
+  - Processor: GitHubReleasesInfoProvider
+    Arguments:
+      github_repo: git-for-windows/git
+      asset_regex: 'Git-[\d.]+-arm64\.exe$'
+      include_prereleases: false
+
+  - Processor: URLDownloader
+    Arguments:
+      filename: "%NAME%-%ARCHITECTURE%.exe"
+
+  - Processor: EndOfCheckPhase
+
+  - Processor: CimianInfoCreator
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: exe
+      cimian_info_name: "%NAME%"
+      cimian_info_category: Development
+      cimian_info_developer: The git development community
+      cimian_info_icon_name: "%NAME%.png"
+      cimian_info_description: >
+        Git is a free and open source distributed version control system
+        designed to handle everything from small to very large projects
+        with speed and efficiency.
+
+  - Processor: CimianImporter
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: exe
+      cimian_subdirectory: apps/dev
+      installer_switches:
+        - VERYSILENT
+        - NORESTART
+        - 'DIR="C:\Program Files\Git"'
+      supported_architectures:
+        - "%ARCHITECTURE%"
+      catalogs:
+        - Development
+        - Testing
+      unattended_install: true
+      unattended_uninstall: false

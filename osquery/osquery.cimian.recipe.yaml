@@ -1,0 +1,46 @@
+Description: Downloads the latest osquery MSI installer and imports into Cimian.
+Identifier: com.github.autopkg.cimian.osquery
+MinimumVersion: "2.7.0"
+Input:
+  NAME: osquery
+  ARCHITECTURE: x64
+
+Process:
+  - Processor: GitHubReleasesInfoProvider
+    Arguments:
+      github_repo: osquery/osquery
+      asset_regex: 'osquery-[\d.]+\.msi$'
+      include_prereleases: false
+
+  - Processor: URLDownloader
+    Arguments:
+      filename: "%NAME%-%ARCHITECTURE%.msi"
+
+  - Processor: EndOfCheckPhase
+
+  - Processor: CimianInfoCreator
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: msi
+      cimian_info_name: "%NAME%"
+      cimian_info_category: Security
+      cimian_info_developer: osquery Foundation
+      cimian_info_icon_name: "%NAME%.png"
+      cimian_info_description: >
+        osquery is an operating system instrumentation framework that
+        exposes an operating system as a high-performance relational
+        database, queryable with SQL.
+
+  - Processor: CimianImporter
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: msi
+      cimian_subdirectory: apps/security
+      supported_architectures:
+        - x64
+        - arm64
+      catalogs:
+        - Development
+        - Testing
+      unattended_install: true
+      unattended_uninstall: true

@@ -1,0 +1,49 @@
+Description: Downloads the latest Krita installer (x64) and imports into Cimian.
+Identifier: com.github.autopkg.cimian.Krita
+MinimumVersion: "2.7.0"
+Input:
+  NAME: Krita
+  ARCHITECTURE: x64
+
+Process:
+  - Processor: URLTextSearcher
+    Arguments:
+      url: https://krita.org/en/download/
+      re_pattern: '(?P<match>https://download\.kde\.org/stable/krita/[0-9.]+/krita-x64-[0-9.]+-setup\.exe)'
+      result_output_var_name: exe_url
+
+  - Processor: URLDownloader
+    Arguments:
+      url: "%exe_url%"
+      filename: "%NAME%-%ARCHITECTURE%.exe"
+
+  - Processor: EndOfCheckPhase
+
+  - Processor: CimianInfoCreator
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: exe
+      cimian_info_name: "%NAME%"
+      cimian_info_category: Design
+      cimian_info_developer: KDE
+      cimian_info_icon_name: "%NAME%.png"
+      cimian_info_description: >
+        Krita is a free and open source painting application, designed for
+        concept art, illustration, matte and texture painting, and 2D
+        animation.
+
+  - Processor: CimianImporter
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: exe
+      cimian_subdirectory: apps/design
+      installer_switches:
+        - /S
+      supported_architectures:
+        - x64
+        - arm64
+      catalogs:
+        - Development
+        - Testing
+      unattended_install: true
+      unattended_uninstall: true

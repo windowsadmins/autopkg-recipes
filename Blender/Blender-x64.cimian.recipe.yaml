@@ -1,0 +1,46 @@
+Description: Downloads the latest Blender MSI installer (x64) and imports into Cimian.
+Identifier: com.github.autopkg.cimian.Blender-x64
+MinimumVersion: "2.7.0"
+Input:
+  NAME: Blender
+  ARCHITECTURE: x64
+
+Process:
+  - Processor: URLTextSearcher
+    Arguments:
+      url: https://www.blender.org/download/
+      re_pattern: '(?P<match>https://[^"]*/blender-[0-9.]+-windows-x64\.msi)'
+      result_output_var_name: msi_url
+
+  - Processor: URLDownloader
+    Arguments:
+      url: "%msi_url%"
+      filename: "%NAME%-%ARCHITECTURE%.msi"
+
+  - Processor: EndOfCheckPhase
+
+  - Processor: CimianInfoCreator
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: msi
+      cimian_info_name: "%NAME%"
+      cimian_info_category: Modeling
+      cimian_info_developer: Blender Foundation
+      cimian_info_icon_name: "%NAME%.png"
+      cimian_info_description: >
+        Blender is a free and open source 3D creation suite supporting the
+        entirety of the 3D pipeline — modelling, rigging, animation,
+        simulation, rendering, compositing and motion tracking.
+
+  - Processor: CimianImporter
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: msi
+      cimian_subdirectory: apps/modeling
+      supported_architectures:
+        - "%ARCHITECTURE%"
+      catalogs:
+        - Development
+        - Testing
+      unattended_install: true
+      unattended_uninstall: true

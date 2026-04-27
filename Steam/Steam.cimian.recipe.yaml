@@ -1,0 +1,42 @@
+Description: Downloads the latest Steam client installer (x64) and imports into Cimian.
+Identifier: com.github.autopkg.cimian.Steam
+MinimumVersion: "2.7.0"
+Input:
+  NAME: Steam
+  ARCHITECTURE: x64
+
+Process:
+  - Processor: URLDownloader
+    Arguments:
+      url: "https://cdn.cloudflare.steamstatic.com/client/installer/SteamSetup.exe"
+      filename: "%NAME%-%ARCHITECTURE%.exe"
+
+  - Processor: EndOfCheckPhase
+
+  - Processor: CimianInfoCreator
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: exe
+      cimian_info_name: "%NAME%"
+      cimian_info_category: Interactive
+      cimian_info_developer: Valve Corporation
+      cimian_info_icon_name: "%NAME%.png"
+      cimian_info_description: >
+        Steam is Valve's gaming platform and store, providing installation
+        and updates for a wide library of titles.
+
+  - Processor: CimianImporter
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: exe
+      cimian_subdirectory: apps/interactive
+      installer_switches:
+        - /S
+      supported_architectures:
+        - x64
+        - arm64
+      catalogs:
+        - Development
+        - Testing
+      unattended_install: true
+      unattended_uninstall: true

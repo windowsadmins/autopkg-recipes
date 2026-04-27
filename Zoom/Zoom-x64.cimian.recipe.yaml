@@ -1,0 +1,38 @@
+Description: Downloads the latest Zoom Workplace MSI installer (x64) and imports into Cimian.
+Identifier: com.github.autopkg.cimian.Zoom-x64
+MinimumVersion: "2.7.0"
+Input:
+  NAME: Zoom
+  ARCHITECTURE: x64
+
+Process:
+  - Processor: URLDownloader
+    Arguments:
+      url: "https://zoom.us/client/latest/ZoomInstallerFull.msi?archType=x64"
+      filename: "%NAME%-%ARCHITECTURE%.msi"
+
+  - Processor: EndOfCheckPhase
+
+  - Processor: CimianInfoCreator
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: msi
+      cimian_info_name: "%NAME%"
+      cimian_info_category: Communication
+      cimian_info_developer: Zoom
+      cimian_info_icon_name: "%NAME%.png"
+      cimian_info_description: >
+        Zoom Workplace. MSI installer supports machine-wide installation.
+
+  - Processor: CimianImporter
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: msi
+      cimian_subdirectory: apps/comms
+      supported_architectures:
+        - "%ARCHITECTURE%"
+      catalogs:
+        - Development
+        - Testing
+      unattended_install: true
+      unattended_uninstall: true

@@ -1,0 +1,45 @@
+Description: Downloads the latest PowerShell MSI installer (x64) and imports into Cimian.
+Identifier: com.github.autopkg.cimian.PowerShell-x64
+MinimumVersion: "2.7.0"
+Input:
+  NAME: PowerShell
+  ARCHITECTURE: x64
+
+Process:
+  - Processor: GitHubReleasesInfoProvider
+    Arguments:
+      github_repo: PowerShell/PowerShell
+      asset_regex: 'PowerShell-[\d.]+-win-x64\.msi$'
+      include_prereleases: false
+
+  - Processor: URLDownloader
+    Arguments:
+      filename: "%NAME%-%ARCHITECTURE%-%version%.msi"
+
+  - Processor: EndOfCheckPhase
+
+  - Processor: CimianInfoCreator
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: msi
+      cimian_info_name: "%NAME%"
+      cimian_info_category: Utilities
+      cimian_info_developer: Microsoft Corporation
+      cimian_info_icon_name: "%NAME%.png"
+      cimian_info_description: >
+        PowerShell is a cross-platform task automation solution made up of
+        a command-line shell, a scripting language, and a configuration
+        management framework.
+
+  - Processor: CimianImporter
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: msi
+      cimian_subdirectory: apps/utilities
+      supported_architectures:
+        - "%ARCHITECTURE%"
+      catalogs:
+        - Development
+        - Testing
+      unattended_install: true
+      unattended_uninstall: true

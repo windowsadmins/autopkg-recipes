@@ -1,0 +1,43 @@
+Description: Downloads the latest Google Chrome Enterprise MSI (x64) and imports into Cimian.
+Identifier: com.github.autopkg.cimian.Chrome
+MinimumVersion: "2.7.0"
+Input:
+  NAME: Chrome
+  DOWNLOAD_URL: https://dl.google.com/dl/chrome/install/googlechromestandaloneenterprise64.msi
+  ARCHITECTURE: x64
+
+Process:
+  - Processor: URLDownloader
+    Arguments:
+      url: "%DOWNLOAD_URL%"
+      filename: "%NAME%.msi"
+
+  - Processor: EndOfCheckPhase
+
+  - Processor: CimianInfoCreator
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: msi
+      cimian_info_name: "%NAME%"
+      cimian_info_category: Browsers
+      cimian_info_developer: Google LLC
+      cimian_info_icon_name: "%NAME%.png"
+      cimian_info_description: >
+        Google Chrome is a fast, secure web browser built for the modern web.
+        Enterprise MSI supports machine-wide installation and policy management.
+
+  - Processor: CimianImporter
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: msi
+      cimian_subdirectory: apps/browsers
+      supported_architectures:
+        - x64
+        - arm64
+      catalogs:
+        - Development
+        - Testing
+      blocking_applications:
+        - chrome
+      unattended_install: true
+      unattended_uninstall: false

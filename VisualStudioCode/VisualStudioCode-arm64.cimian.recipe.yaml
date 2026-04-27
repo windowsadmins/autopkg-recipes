@@ -1,0 +1,47 @@
+Description: Downloads the latest Visual Studio Code system installer (arm64) and imports into Cimian.
+Identifier: com.github.autopkg.cimian.VisualStudioCode-arm64
+MinimumVersion: "2.7.0"
+Input:
+  NAME: VisualStudioCode
+  ARCHITECTURE: arm64
+
+Process:
+  - Processor: URLDownloader
+    Arguments:
+      url: "https://code.visualstudio.com/sha/download?build=stable&os=win32-arm64"
+      filename: "%NAME%-%ARCHITECTURE%.exe"
+
+  - Processor: EndOfCheckPhase
+
+  - Processor: CimianInfoCreator
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: exe
+      cimian_info_name: "%NAME%"
+      cimian_info_category: Development
+      cimian_info_developer: Microsoft Corporation
+      cimian_info_icon_name: "%NAME%.png"
+      cimian_info_description: >
+        Visual Studio Code is a lightweight but powerful source code editor
+        with built-in support for debugging, Git, and extensions.
+
+  - Processor: CimianImporter
+    Arguments:
+      pkg_path: "%pathname%"
+      installer_type: exe
+      cimian_subdirectory: apps/dev
+      installer_switches:
+        - SP-
+        - VERYSILENT
+        - SUPPRESSMSGBOXES
+        - NORESTART
+        - NOCANCEL
+        - 'DIR="C:\Program Files\Microsoft VS Code"'
+        - MERGETASKS=!runcode
+      supported_architectures:
+        - "%ARCHITECTURE%"
+      catalogs:
+        - Development
+        - Testing
+      unattended_install: true
+      unattended_uninstall: false
