@@ -7,6 +7,16 @@ Input:
   ARCHITECTURE: arm64
 
 Process:
+  # The Mozilla EXE installer stub reports its own internal FileVersion
+  # (~18.x), NOT the real Firefox version. Fetch the actual latest version
+  # from Mozilla's product-details endpoint and pass it in explicitly via
+  # cimian_info_version so CimianInfoCreator does not read it from the EXE.
+  - Processor: URLTextSearcher
+    Arguments:
+      url: https://product-details.mozilla.org/1.0/firefox_versions.json
+      re_pattern: '"LATEST_FIREFOX_VERSION":\s*"(?P<version>[0-9]+(?:\.[0-9]+)+)"'
+      result_output_var_name: version
+
   - Processor: URLDownloader
     Arguments:
       url: "%DOWNLOAD_URL%"
@@ -19,6 +29,7 @@ Process:
       pkg_path: "%pathname%"
       installer_type: exe
       cimian_info_name: "%NAME%"
+      cimian_info_version: "%version%"
       cimian_info_category: Browsers
       cimian_info_developer: Mozilla
       cimian_info_icon_name: "%NAME%.png"

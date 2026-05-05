@@ -6,10 +6,14 @@ Input:
   ARCHITECTURE: arm64
 
 Process:
+  # Blender's MSI ships with an empty ProductVersion property, which makes
+  # CimianInfoCreator fall back to 0.0.0. Capture the real version from
+  # the download URL (e.g. blender-4.5.1-windows-arm64.msi) and pass it in
+  # explicitly via cimian_info_version.
   - Processor: URLTextSearcher
     Arguments:
       url: https://www.blender.org/download/
-      re_pattern: '(?P<match>https://[^"]*/blender-[0-9.]+-windows-arm64\.msi)'
+      re_pattern: '(?P<match>https://[^"]*/blender-(?P<version>[0-9]+\.[0-9]+(?:\.[0-9]+)?)-windows-arm64\.msi)'
       result_output_var_name: msi_url
 
   - Processor: URLDownloader
@@ -24,6 +28,7 @@ Process:
       pkg_path: "%pathname%"
       installer_type: msi
       cimian_info_name: "%NAME%"
+      cimian_info_version: "%version%"
       cimian_info_category: Modeling
       cimian_info_developer: Blender Foundation
       cimian_info_icon_name: "%NAME%.png"
