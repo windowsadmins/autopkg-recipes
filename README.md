@@ -14,6 +14,11 @@ Recipes use the YAML-native `.cimian.recipe.yaml` format and the
 autopkg repo-add https://github.com/windowsadmins/autopkg-recipes.git
 ```
 
+Most recipes verify the download's Authenticode signature with `SignToolVerifier`,
+so the AutoPkg host needs `signtool.exe` from the Windows SDK. If it is not under
+`Windows Kits\10\bin\x64` or `Windows Kits\10\App Certification Kit`, set
+`signtool_path` in your override.
+
 ## Layout
 
 One directory per app. Recipes are named after the app and architecture:
