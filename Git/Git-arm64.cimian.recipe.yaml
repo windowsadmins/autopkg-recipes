@@ -18,6 +18,10 @@ Process:
 
   - Processor: EndOfCheckPhase
 
+  - Processor: SignToolVerifier
+    Arguments:
+      input_path: "%pathname%"
+
   - Processor: CimianInfoCreator
     Arguments:
       pkg_path: "%pathname%"

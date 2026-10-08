@@ -46,6 +46,9 @@ Issues and pull requests are welcome. New recipes should:
    `supported_architectures`.
 5. Default to `catalogs: [Development, Testing]` and
    `unattended_install: true`.
+6. Verify the download with `SignToolVerifier` (`input_path: "%pathname%"`)
+   right after `EndOfCheckPhase`, unless the vendor does not sign its
+   installer (7-Zip is the current exception).
 
 ## License
 
